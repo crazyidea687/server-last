@@ -10,8 +10,8 @@ server.listen(port, host, () => {
 let sockets = [];
 
 server.on('connection', (socket) => {
-    console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
-    sockets.push(sock);
+    console.log('CONNECTED: ' + socket.remoteAddress + ':' + socket.remotePort);
+    sockets.push(socket);
     
     var timestamp = Math.floor(Date.now()/1000);
 
@@ -47,15 +47,15 @@ server.on('connection', (socket) => {
     processOperator();
 	
 	
-        console.log('DATA ' + sock.remoteAddress + ': ' + data);
+        console.log('DATA ' + socket.remoteAddress + ': ' + data);
         // Write the data back to all the connected, the client will receive it as data from the server
-        sockets.forEach(function(sock, index, array) {
-            sock.write(sock.remoteAddress + ':' + sock.remotePort + " said " + data + '\n');
+        sockets.forEach(function(socket, index, array) {
+            sock.write(socket.remoteAddress + ':' + socket.remotePort + " said " + data + '\n');
         });
     });
 
     // Add a 'close' event handler to this instance of socket
-    sock.on('close', function(data) {
+    socket.on('close', function(data) {
         let index = sockets.findIndex(function(o) {
             return o.remoteAddress === sock.remoteAddress && o.remotePort === sock.remotePort;
         })
