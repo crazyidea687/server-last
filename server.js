@@ -50,7 +50,7 @@ server.on('connection', (socket) => {
         console.log('DATA ' + socket.remoteAddress + ': ' + data);
         // Write the data back to all the connected, the client will receive it as data from the server
         sockets.forEach(function(socket, index, array) {
-            sock.write(socket.remoteAddress + ':' + socket.remotePort + " said " + data + '\n');
+            socket.write(socket.remoteAddress + ':' + socket.remotePort + " said " + data + '\n');
         });
     });
 
