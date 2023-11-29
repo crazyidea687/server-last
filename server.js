@@ -9,28 +9,44 @@ server.listen(port, host, () => {
 
 let sockets = [];
 
-server.on('connection', function(sock) {
+server.on('connection', (socket) => {
     console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
     sockets.push(sock);
     
     var timestamp = Math.floor(Date.now()/1000);
-    sock.on('data', function(data) {
+
+    socket.on('data', async function(data) {
 	let comingFromClientArray;
 	console.log(timestamp+'\n');
 	let define_inst = data.toString();
-	let slice_code = define_int.slice(',') ;
+	let slice_code = define_inst.slice(',') ;
 	console.log("==========================");
-	if(define_ints.startsWith('*SCOS')&&slice_code[3]=='R0'){
-		if(slice_code[3]=='0'){
-			console.log('${slice_code[3]} Request unlock Lock .');
-			console.log('${slice_code[3]} code SERVER ---> LOCK : ${slice_code[4]} ');
-			let code = "0xFFFF*SCOS,OM,${slice_code[2]},${slice_code[3]},0,20,10234,${timestamp}#\n";
-			socket.write(code);
-			console.log('Packet sent SERVER to LOCK --> ${code} ');
-			
-		}
-	}
-	if(
+
+    async function getCommand (){
+        if(define_inst.startsWith('*SCOS')&&slice_code[3]=='R0'){
+            if(slice_code[3]=='0'){
+                console.log(`${slice_code[3]} Request unlock Lock .`);
+                console.log(`${slice_code[3]} code SERVER ---> LOCK : ${slice_code[4]} `);
+                let code = `0xFFFF*SCOS,OM,${slice_code[2]},${slice_code[3]},0,20,10234,${timestamp}#\n`;
+                socket.write(code);
+                console.log(`Packet sent SERVER to LOCK --> ${code} `);
+                
+            }
+        }
+    }
+    async function processOperator(){
+
+            if(slice_code[1] == "*SCOR" && slice_code[3] == "R0" && slice_code[4] == "0" && slice_code[5] != "20"){
+                let code = `0xFFFF*SCOS,OM,${slice_code[2]},L0,0,${slice_code[3]},10234,${timestamp}#\n`;
+                console.log(`Packet SERVER ---> LOCK ${code}`);
+            }
+
+    }
+
+    getCommand ();
+    processOperator();
+	
+	
         console.log('DATA ' + sock.remoteAddress + ': ' + data);
         // Write the data back to all the connected, the client will receive it as data from the server
         sockets.forEach(function(sock, index, array) {
